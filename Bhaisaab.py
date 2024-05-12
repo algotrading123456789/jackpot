@@ -28,7 +28,6 @@ st.title('Navigate Your Trades')
 
 
 def job():
-
     def vix():
         class vix_india:
             def __init__(self, starting_date, ending_date=None):
@@ -54,7 +53,6 @@ def job():
                     vix_data = pd.json_normalize(data_vix["data"])
                     return vix_data
                 except requests.RequestException as ex:
-    
                     return pd.DataFrame()
     
         # Verification
@@ -71,7 +69,8 @@ def job():
             return Nifty_Vix, Diff_Vix
         else:
             print("Dataframe is empty.")
-            return pd.DataFrame()
+            return None, None  # Return None for Nifty_Vix and Diff_Vix if dataframe_vix is empty
+    
     Nifty_Vix, Diff_Vix = vix()
 
     class SpotPrice:
