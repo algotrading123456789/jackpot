@@ -59,8 +59,8 @@ def job():
 
     # Verification
     if __name__ == "__main__":
-    vix_india_ohcs = vix_india(starting_date="25-04-2024")
-    data_vix = vix_india_ohcs.fetch_vix_data()
+        vix_india_ohcs = vix_india(starting_date="25-04-2024")
+        data_vix = vix_india_ohcs.fetch_vix_data()
 
     if not data_vix.empty:
         dataframe_vix = pd.DataFrame(data_vix)
