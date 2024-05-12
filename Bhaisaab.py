@@ -28,50 +28,51 @@ st.title('Navigate Your Trades')
 
 
 def job():
-    #Integrating milli-Second Spot Data (/1000 - to less the burden) and classyifying them in Candle components
 
-    class vix_india:
-        def __init__(self, starting_date, ending_date=None):
-            self.starting_date = starting_date
-            if ending_date is None:
-                ending_date = datetime.now().strftime("%d-%m-%Y")# to getting the latest closing iv
-            self.ending_date = ending_date
-            self.url = f"https://www.nseindia.com/api/historical/vixhistory?from={starting_date}&to={ending_date}"
-            self._session = requests.Session()
-            self._session.headers = {
-                "Accept": "*/*",
-                "Accept-Encoding": "gzip, deflate, br, zstd",
-                "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-            }
-            self._session.get("https://www.nseindia.com/reports-indices-historical-vix")
-
-        def fetch_vix_data(self):
-            try:
-                response = self._session.get(self.url, timeout=10)
-                response.raise_for_status()  # Raise an exception for 4xx and 5xx status codes
-                data_vix = response.json()
-                vix_data = pd.json_normalize(data_vix["data"])
-                return vix_data
-            except requests.RequestException as ex:
-
-                return pd.DataFrame()
-
-    # Verification
-    if __name__ == "__main__":
-        vix_india_ohcs = vix_india(starting_date="25-04-2024")
-        data_vix = vix_india_ohcs.fetch_vix_data()
-
-    if not data_vix.empty:
-        dataframe_vix = pd.DataFrame(data_vix)
-        Nifty_Vix = dataframe_vix.iloc[-1, 7]
-        Nifty_Vix_Y = dataframe_vix.iloc[-2, 7]
-        D_Vix = Nifty_Vix - Nifty_Vix_Y
-        Diff_Vix = "{:.2f}%".format(D_Vix)
-        return dataframe_vix
-    else:
-        print("Dataframe is empty.")
-        return pd.DataFrame()
+    def vix():
+        class vix_india:
+            def __init__(self, starting_date, ending_date=None):
+                self.starting_date = starting_date
+                if ending_date is None:
+                    ending_date = datetime.now().strftime("%d-%m-%Y")# to getting the latest closing iv
+                self.ending_date = ending_date
+                self.url = f"https://www.nseindia.com/api/historical/vixhistory?from={starting_date}&to={ending_date}"
+                self._session = requests.Session()
+                self._session.headers = {
+                    "Accept": "*/*",
+                    "Accept-Encoding": "gzip, deflate, br, zstd",
+                    "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+                }
+                self._session.get("https://www.nseindia.com/reports-indices-historical-vix")
+    
+            def fetch_vix_data(self):
+                try:
+                    response = self._session.get(self.url, timeout=10)
+                    response.raise_for_status()  # Raise an exception for 4xx and 5xx status codes
+                    data_vix = response.json()
+                    vix_data = pd.json_normalize(data_vix["data"])
+                    return vix_data
+                except requests.RequestException as ex:
+    
+                    return pd.DataFrame()
+    
+        # Verification
+        if __name__ == "__main__":
+            vix_india_ohcs = vix_india(starting_date="25-04-2024")
+            data_vix = vix_india_ohcs.fetch_vix_data()
+    
+        if not data_vix.empty:
+            dataframe_vix = pd.DataFrame(data_vix)
+            Nifty_Vix = dataframe_vix.iloc[-1, 7]
+            Nifty_Vix_Y = dataframe_vix.iloc[-2, 7]
+            D_Vix = Nifty_Vix - Nifty_Vix_Y
+            Diff_Vix = "{:.2f}%".format(D_Vix)
+            return Nifty_Vix, Diff_Vix
+        else:
+            print("Dataframe is empty.")
+            return pd.DataFrame()
+    Nifty_Vix, Diff_Vix = vix()
 
     class SpotPrice:
         def __init__(self, identifier="NIFTY 50", name="NIFTY 50", timeout=15):
