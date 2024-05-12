@@ -291,4 +291,10 @@ def job():
     if message:
         st.title(f"{message}")
 
-job()
+# Schedule the job to run every hour
+schedule.every(2).minute.do(job)
+
+# Infinite loop to keep the script running
+while True:
+    schedule.run_pending()
+    time.sleep(60)  # Check every minute if there's any job to run
