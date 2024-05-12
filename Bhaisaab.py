@@ -73,66 +73,69 @@ def job():
     
     Nifty_Vix, Diff_Vix = vix()
 
-    class SpotPrice:
-        def __init__(self, identifier="NIFTY 50", name="NIFTY 50", timeout=15):
-            self.url = "https://www.nseindia.com/api/chart-databyindex?index=NIFTY%2050&indices=true"
-            self._session = requests.Session()
-            self._session.headers = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36",
-                "Accept": "*/*",
-                "Accept-Language": "en-US,en;q=0.5"
-            }
-            self._timeout = timeout
-            self._session.get("https://www.nseindia.com/", timeout=15)
 
-        def fetch_data(self):
-            try:
-                response = self._session.get(url=self.url, timeout=5)  # Increased timeout
-                data = response.json()
-                graph_data = data.get("grapthData", [])
+    def spot():
+        class SpotPrice:
+            def __init__(self, identifier="NIFTY 50", name="NIFTY 50", timeout=15):
+                self.url = "https://www.nseindia.com/api/chart-databyindex?index=NIFTY%2050&indices=true"
+                self._session = requests.Session()
+                self._session.headers = {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36",
+                    "Accept": "*/*",
+                    "Accept-Language": "en-US,en;q=0.5"
+                }
+                self._timeout = timeout
+                self._session.get("https://www.nseindia.com/", timeout=15)
+    
+            def fetch_data(self):
+                try:
+                    response = self._session.get(url=self.url, timeout=5)  # Increased timeout
+                    data = response.json()
+                    graph_data = data.get("grapthData", [])
+    
+                    timestamps = [entry[0] / 1000 for entry in graph_data]  # Convert milliseconds to seconds
+                    date_timings = pd.to_datetime(timestamps, unit='s')  # Convert timestamps to datetime objects
+    
+                    values = [entry[1] for entry in graph_data]
+                    df = pd.DataFrame({"Timestamp": date_timings, "Value": values})
+                    return df
+    
+                except Exception as ex:
+                    print("Error: {}".format(ex))
+                    self._session.get("https://www.nseindia.com/", timeout=self._timeout)  # to renew the session
+                    return pd.DataFrame()
+    
+            def create_candles(self, spot_data, interval_minutes=15):
+                try:
+                    # Set 'Timestamp' as the index
+                    spot_data.set_index('Timestamp', inplace=True)
+    
+                    # Resample data to create candles
+                    candles = spot_data.resample(f'{interval_minutes}min').agg({
+                        'Value': 'ohlc'
+                    })
+                    candles.columns = ['Open', 'High', 'Low', 'Close']
+                    candles.dropna(inplace=True)
+    
+                    # Reset index to make 'Timestamp' a column again
+                    candles.reset_index(inplace=True)
+    
+                    return candles
+    
+                except Exception as ex:
+                    print("Error creating candles: {}".format(ex))
+                    return pd.DataFrame()
+    
+        # Testing the data
+        if __name__ == "__main__":
+            obj = SpotPrice(identifier="NIFTY 50")
+            spot_mtd = obj.fetch_data()
+            candles = obj.create_candles(spot_mtd, interval_minutes=15)
+            candles['Time'] = candles['Timestamp'].dt.time  # Extract time component
+            candles['Date'] = candles['Timestamp'].dt.date  # Extract date component
+            return spot_mtd, candles
 
-                timestamps = [entry[0] / 1000 for entry in graph_data]  # Convert milliseconds to seconds
-                date_timings = pd.to_datetime(timestamps, unit='s')  # Convert timestamps to datetime objects
-
-                values = [entry[1] for entry in graph_data]
-                df = pd.DataFrame({"Timestamp": date_timings, "Value": values})
-                return df
-
-            except Exception as ex:
-                print("Error: {}".format(ex))
-                self._session.get("https://www.nseindia.com/", timeout=self._timeout)  # to renew the session
-                return pd.DataFrame()
-
-        def create_candles(self, spot_data, interval_minutes=15):
-            try:
-                # Set 'Timestamp' as the index
-                spot_data.set_index('Timestamp', inplace=True)
-
-                # Resample data to create candles
-                candles = spot_data.resample(f'{interval_minutes}min').agg({
-                    'Value': 'ohlc'
-                })
-                candles.columns = ['Open', 'High', 'Low', 'Close']
-                candles.dropna(inplace=True)
-
-                # Reset index to make 'Timestamp' a column again
-                candles.reset_index(inplace=True)
-
-                return candles
-
-            except Exception as ex:
-                print("Error creating candles: {}".format(ex))
-                return pd.DataFrame()
-
-    # Testing the data
-    if __name__ == "__main__":
-        obj = SpotPrice(identifier="NIFTY 50")
-        spot_mtd = obj.fetch_data()
-        candles = obj.create_candles(spot_mtd, interval_minutes=15)
-        candles['Time'] = candles['Timestamp'].dt.time  # Extract time component
-        candles['Date'] = candles['Timestamp'].dt.date  # Extract date component
-
-
+    spot_data, candles_data = spot()
 
 
 
