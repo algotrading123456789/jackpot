@@ -135,7 +135,7 @@ def job():
             candles['Date'] = candles['Timestamp'].dt.date  # Extract date component
             return spot_mtd, candles
 
-    spot_data, candles_data = spot()
+    spot_mtd, candles = spot()
 
 
 
