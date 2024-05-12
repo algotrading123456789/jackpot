@@ -59,7 +59,7 @@ def job():
 
     # Verification
     if __name__ == "__main__":
-        vix_india_ohcs = vix_india(starting_date="17-04-2024")
+        vix_india_ohcs = vix_india(starting_date="25-04-2024")
         data_vix = vix_india_ohcs.fetch_vix_data()
 
     dataframe_vix = pd.DataFrame(data_vix)
