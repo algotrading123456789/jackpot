@@ -61,12 +61,11 @@ def job():
     if __name__ == "__main__":
         vix_india_ohcs = vix_india(starting_date="25-04-2024")
         data_vix = vix_india_ohcs.fetch_vix_data()
-
-    dataframe_vix = pd.DataFrame(data_vix)
-    Nifty_Vix = dataframe_vix.iloc[-1, 7]
-    Nifty_Vix_Y = dataframe_vix.iloc[-2, 7]
-    D_Vix = Nifty_Vix - Nifty_Vix_Y
-    Diff_Vix = "{:.2f}%".format(D_Vix)
+        dataframe_vix = pd.DataFrame(data_vix)
+        Nifty_Vix = dataframe_vix.iloc[-1, 7]
+        Nifty_Vix_Y = dataframe_vix.iloc[-2, 7]
+        D_Vix = Nifty_Vix - Nifty_Vix_Y
+        Diff_Vix = "{:.2f}%".format(D_Vix)
     
 
 
