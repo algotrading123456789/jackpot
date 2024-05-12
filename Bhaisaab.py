@@ -203,7 +203,7 @@ def job():
         )
     ])
 
-    st.plotly_chart(fig)
+    st.plotly_chart(fig,use_container_width=True)
 
 
 
@@ -218,12 +218,19 @@ def job():
     it_money = (market_open // 50) * 50
 
 
-    st.metric("Spot price", formatted_spot, delta_spot)
-    st.metric('Market Open at', market_open)
-    st.metric('Volatility', Nifty_Vix, Diff_Vix)
-    st.write(f'Optimal Strike price for trade: {it_money}')
-    st.write(f'Resistance bar: {resistance}')
-    st.write(f'Support bar: {support}')
+    col1, col2, col3 = st.columns(3)
+
+# Display metrics in each column
+    col1.metric("Spot price", formatted_spot, delta_spot)
+    col2.metric('Market Open at', market_open)
+    col3.metric('Volatility', Nifty_Vix, Diff_Vix)
+    
+    
+    st.markdown(f'<h2 style="color: black ;">Optimal Strike price for trade: {it_money}</h2>', unsafe_allow_html=True)
+    st.markdown('\n')  # Adding a blank line for spacing
+    st.markdown(f'<h2 style="color: red;">Resistance bar: {resistance}</h2>', unsafe_allow_html=True)
+    st.markdown('\n\n')  # Adding two blank lines for more spacing
+    st.markdown(f'<h2 style="color: blue;">Support bar: {support}</h2>', unsafe_allow_html=True)
 
 
 
@@ -233,7 +240,7 @@ def job():
         prev_row = None  # Variable to store previous row data
         prev1_row = None 
 
-        if Nifty_Vix > 15:
+        if Nifty_Vix > 25:
             for index, row in candles.iterrows():
                 if prev_row is not None and (prev_row['Open'] <= resistance):
                     if row['Close'] > resistance:
@@ -255,29 +262,29 @@ def job():
 
     buy_calls_df, buy_puts_df, message = Buy()
 
-
+    col4, col5 = st.columns(2)
     if buy_calls_df is not None:
         if not buy_calls_df.empty:
-            st.write("**Call Trades to be executed**")
-            st.dataframe(buy_calls_df)
+            col4.write("**Call Trades to be executed**")
+            col4.dataframe(buy_calls_df)
         else:
-            st.write("**Refrain from buying Call Options**")
-            st.dataframe(buy_calls_df)
+            col4.write("**Refrain from buying Call Options**")
+            col4.dataframe(buy_calls_df)
     else:
-        st.write("**Refrain from buying Call Options**")
-        st.dataframe(buy_calls_df)
+        col4.write("**Refrain from buying Call Options**")
+        col4.dataframe(buy_calls_df)
 
 
     if buy_puts_df is not None:
         if not buy_puts_df.empty:
-            st.write("**Put Trades to be executed**")
-            st.dataframe(buy_puts_df)
+            col5.write("**Put Trades to be executed**")
+            col5.dataframe(buy_puts_df)
         else:
-            st.write("**Refrain from buying Put Options**")
-            st.dataframe(buy_puts_df)
+            col5.write("**Refrain from buying Put Options**")
+            col5.dataframe(buy_puts_df)
     else:
-        st.write("**Refrain from buying Put Options**")
-        st.dataframe(buy_puts_df)
+        col5.write("**Refrain from buying Put Options**")
+        col5.dataframe(buy_puts_df)
 
 
     if message:
