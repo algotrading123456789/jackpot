@@ -292,7 +292,7 @@ def job():
         st.title(f"{message}")
 
 # Schedule the job to run every hour
-schedule.every(2).minute.do(job)
+schedule.every(2).minutes.do(job)
 
 # Infinite loop to keep the script running
 while True:
